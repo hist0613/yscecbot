@@ -10,6 +10,7 @@ import datetime
 
 import requests
 from bs4 import BeautifulSoup
+from pyvirtualdisplay import Display
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -51,6 +52,8 @@ def main(current_time):
 
     except:
         # 저장된 세션이 존재하지 않는 경우
+        display = Display(visible=0, size=(800, 600))
+        display.start()
         driver = webdriver.Firefox()
         driver.get("http://yscec.yonsei.ac.kr/login/index.php")
         username_input = WebDriverWait(driver, 5).until(
@@ -77,6 +80,7 @@ def main(current_time):
         for cookie in driver.get_cookies():
             session.cookies.set(cookie['name'], cookie['value'])
         driver.close()
+        display.stop()
 
         print("Login Success!")
 
