@@ -40,9 +40,10 @@ def krtime2datetime(text):
     return yyyymmdd + hhmm
 
 def main(current_time):
+    path = os.path.dirname(os.path.realpath(__file__))
     try:
         # 저장된 세션이 존재하는 경우
-        with open("user/{user_id}/session".format(user_id=STUDENT_ID), 'rb') as fp:
+        with open(os.path.join(path, "user/{user_id}/session".format(user_id=STUDENT_ID)), 'rb') as fp:
             session = pickle.load(fp)
 
         # 저장된 세션이 존재하지만 로그인에 실패한 경우
@@ -85,11 +86,11 @@ def main(current_time):
         print("Login Success!")
 
         # 로그인 처리 후 세션 저장
-        with open("user/{user_id}/session".format(user_id=STUDENT_ID), 'wb') as fp:
+        with open(os.path.join(path, "user/{user_id}/session".format(user_id=STUDENT_ID)), 'wb') as fp:
             pickle.dump(session, fp)
 
     try:
-        with open("user/{user_id}/already_noticed".format(user_id=STUDENT_ID), 'rb') as fp:
+        with open(os.path.join(path, "user/{user_id}/already_noticed".format(user_id=STUDENT_ID)), 'rb') as fp:
             already_noticed = pickle.load(fp)
     except FileNotFoundError:
         already_noticed = set()
@@ -159,7 +160,7 @@ def main(current_time):
             print(message)
             sc.rtm_send_message(channel="general", message=message)
 
-            with open("user/{user_id}/already_noticed".format(user_id=STUDENT_ID), 'wb') as fp:
+            with open(os.path.join(path, "user/{user_id}/already_noticed".format(user_id=STUDENT_ID)), 'wb') as fp:
                 pickle.dump(already_noticed, fp)
 
         recourses_link = "http://yscec.yonsei.ac.kr/course/resources.php?id={course_id}".format(course_id=course_id)
