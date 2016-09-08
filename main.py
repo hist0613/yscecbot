@@ -111,7 +111,7 @@ def main(current_time):
 
         print('\n' + course_title)
 
-        message = "*" + course_title + "*\n"
+        message = "*" + course_title + " - 공지사항*\n"
         flag = 0
 
         # 과목별로 사용하는 게시판(forum)들이 다르기 때문에
@@ -163,9 +163,38 @@ def main(current_time):
             with open(os.path.join(path, "user/{user_id}/already_noticed".format(user_id=STUDENT_ID)), 'wb') as fp:
                 pickle.dump(already_noticed, fp)
 
-        recourses_link = "http://yscec.yonsei.ac.kr/course/resources.php?id={course_id}".format(course_id=course_id)
+        message = "*" + course_title + " - 강의자료*\n"
+        flag = 0
 
+        # 강의 자료가 올라오는 것을 체크할 수 있어야함
+        resources_link = "http://yscec.yonsei.ac.kr/course/resources.php?id={course_id}".format(course_id=course_id)
+        resources_page = BeautifulSoup(session.get(resources_link).text.replace('<td colspan="3">', '<tr><td colspan="3">'), "html.parser")
+        table = resources_page.find_all("table")[0]
+        for tr in table.tbody.find_all('tr'):
+            if 'r0' in tr.get('class', '') or 'r1' in tr.get('class', ''):
+                resource = tr.find_all('td')
+                resource_name = resource[1].a.text
+                resource_link = resource[1].a['href']
+                resource_description = resource[2].text
 
+                if "folder" in resource_link:
+                    resource_name += '/\n'
+                    folder_page = BeautifulSoup(session.get(resource_link).text, "html.parser")
+                    for resource in folder_page.find_all("span", "fp-filename"):
+                        if resource.text.strip() != "":
+                            resource_name += ' - ' + resource.text + '\n'
+
+                if (course_id, resource_name) not in already_noticed:
+                    flag = 1
+                    already_noticed.add((course_id, resource_name))
+                    message += resource_name + "\n"
+
+        if flag:
+            print(message)
+            sc.rtm_send_message(channel="general", message=message)
+
+            with open(os.path.join(path, "user/{user_id}/already_noticed".format(user_id=STUDENT_ID)), 'wb') as fp:
+                pickle.dump(already_noticed, fp)
 
 
     # 세션은 기본적으로 저장해놓지만 저장된 세션이 계속 사용가능한지, 즉 로그인 성공인지 실패인지 다른 페이지에서도 확인할 수 있어야함
