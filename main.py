@@ -35,7 +35,10 @@ def krtime2datetime(text):
     yyyymmdd = datetime.datetime.strptime(yyyymmdd, "%Y년 %m월 %d일")
     hhmm = hhmm.replace("오전", "AM")
     hhmm = hhmm.replace("오후", "PM")
-    hhmm = datetime.datetime.strptime(hhmm, "%p %I:%M")
+    try:
+        hhmm = datetime.datetime.strptime(hhmm, "%p %I:%M")
+    except ValueError:
+        hhmm = datetime.datetime.strptime(hhmm, "%H:%M")
     hhmm = datetime.timedelta(hours=hhmm.hour, minutes=hhmm.minute)
     return yyyymmdd + hhmm
 
