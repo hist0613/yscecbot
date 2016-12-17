@@ -132,7 +132,10 @@ def main(current_time):
             posts = [post for post in posts.find_all('li') if post.get('class', [''])[0] != 'isnotice']
             for post in posts:
                 # post_title = post.find_all('h1', 'thread-post-title')[0].a.text
-                post_id = post.find_all('h1', 'thread-post-title')[0].a['onclick']
+                try:
+                    post_id = post.find_all('h1', 'thread-post-title')[0].a['onclick']
+                except TypeError:
+                    continue
                 post_id = int(re.search(r'\d+', post_id).group())
 
                 # 글 상세 페이지 가져오기
