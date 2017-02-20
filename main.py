@@ -54,7 +54,7 @@ def main(current_time):
             print("NotValidSession")
             raise Exception("NotValidSession")
 
-    except:
+    except FileNotFoundError:
         # 저장된 세션이 존재하지 않는 경우
         display = Display(visible=0, size=(800, 600))
         display.start()
@@ -73,6 +73,18 @@ def main(current_time):
         password_input.send_keys(Keys.RETURN)
 
         time.sleep(3)
+
+        WebDriverWait(driver, 5).until(
+            expected_conditions.alert_is_present()
+        )
+        alert = driver.switch_to_alert()
+        alert.accept()
+
+        time.sleep(3)
+        if len(driver.window_handles) > 1:
+            driver.switch_to.window(driver.window_handles[-1])
+            driver.close()
+            driver.switch_to.window(driver.window_handles[0])
 
         # http://yscec.yonsei.ac.kr/my/ 로 이동하지 않았다면 로그인이 실패한 상황
         if driver.current_url != "http://yscec.yonsei.ac.kr/my/":
